@@ -104,7 +104,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             setState(() {
                               _isTyping = true;
                             });
-                            await ApiService.sendMessage(
+                            final listChat = await ApiService.sendMessage(
                                 message: textEditingController.text,
                                 modelId: modelProvider.getCurrentModel);
                           } catch (error) {
