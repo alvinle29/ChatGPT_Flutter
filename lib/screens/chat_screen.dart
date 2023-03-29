@@ -1,6 +1,7 @@
 import 'package:chat_gpt_application/constants/constants.dart';
 import 'package:chat_gpt_application/services/assets_manager.dart';
 import 'package:chat_gpt_application/widgets/chat_widget.dart';
+import 'package:chat_gpt_application/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -40,8 +41,26 @@ class _ChatScreenState extends State<ChatScreen> {
           title: const Text('ChatGPT'),
           actions: [
             IconButton(
-                onPressed: () {},
-                icon: Icon(
+                onPressed: () async {
+                  await showModalBottomSheet(
+                    backgroundColor: scaffoldBackgroundColor,
+                      context: context,
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Row(
+                            children: const [
+                              Flexible(
+                                  child: TextWidget(
+                                label: "Choose model",
+                                fontSize: 16,
+                              ))
+                            ],
+                          ),
+                        );
+                      });
+                },
+                icon: const Icon(
                   Icons.more_vert_rounded,
                   color: Colors.white,
                 ))
@@ -56,7 +75,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     itemBuilder: (context, index) {
                       return ChatWidget(
                         msg: chatMessages[index]["msg"].toString(),
-                        chatIndex: int.parse(chatMessages[index]["chatIndex"].toString()),
+                        chatIndex: int.parse(
+                            chatMessages[index]["chatIndex"].toString()),
                       );
                     }),
               ),
