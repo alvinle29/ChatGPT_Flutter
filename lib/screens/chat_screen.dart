@@ -21,16 +21,17 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   bool _isTyping = false;
+  List<ChatModel> chatList = [];
 
   late TextEditingController textEditingController;
   late FocusNode focusNode;
-
-  List<ChatModel> chatList = [];
+  late ScrollController _listScrollController;
 
   @override
   void initState() {
     textEditingController = TextEditingController();
     focusNode = FocusNode();
+    _listScrollController = ScrollController();
     super.initState();
   }
 
@@ -38,6 +39,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void dispose() {
     textEditingController.dispose();
     focusNode.dispose();
+    _listScrollController.dispose();
     super.dispose();
   }
 
@@ -68,6 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Column(children: [
             Flexible(
               child: ListView.builder(
+                  controller: _listScrollController,
                   itemCount: chatList.length,
                   itemBuilder: (context, index) {
                     return ChatWidget(
@@ -114,14 +117,14 @@ class _ChatScreenState extends State<ChatScreen> {
                             });
                             chatList.addAll(await ApiService.sendMessage(
                                 message: textEditingController.text,
-                                modelId: modelProvider.getCurrentModel)
-                            );
+                                modelId: modelProvider.getCurrentModel));
                             setState(() {});
                           } catch (error) {
                             log("error $error");
                           } finally {
                             setState(() {
                               _isTyping = false;
+                              autoScrollToEnd();
                             });
                           }
                         },
@@ -135,5 +138,12 @@ class _ChatScreenState extends State<ChatScreen> {
             )
           ]),
         ));
+  }
+
+  void autoScrollToEnd() {
+    _listScrollController.animateTo(
+        _listScrollController.position.maxScrollExtent,
+        duration: const Duration(seconds: 2),
+        curve: Curves.easeOut);
   }
 }
