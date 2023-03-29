@@ -5,11 +5,11 @@ import 'package:chat_gpt_application/services/api_services.dart';
 import 'package:chat_gpt_application/services/assets_manager.dart';
 import 'package:chat_gpt_application/services/services.dart';
 import 'package:chat_gpt_application/widgets/chat_widget.dart';
-import 'package:chat_gpt_application/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
+import '../models/chat_model.dart';
 import '../providers/models_provider.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -23,6 +23,8 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isTyping = false;
 
   late TextEditingController textEditingController;
+
+  List<ChatModel> chatList = [];
 
   @override
   void initState() {
@@ -63,12 +65,11 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Column(children: [
             Flexible(
               child: ListView.builder(
-                  itemCount: 6,
+                  itemCount: chatList.length,
                   itemBuilder: (context, index) {
                     return ChatWidget(
-                      msg: chatMessages[index]["msg"].toString(),
-                      chatIndex: int.parse(
-                          chatMessages[index]["chatIndex"].toString()),
+                      msg: chatList[index].msg,
+                      chatIndex: chatList[index].chatIndex,
                     );
                   }),
             ),
@@ -103,10 +104,15 @@ class _ChatScreenState extends State<ChatScreen> {
                           try {
                             setState(() {
                               _isTyping = true;
+                              chatList.add(ChatModel(
+                                  msg: textEditingController.text,
+                                  chatIndex: 0));
                             });
-                            final listChat = await ApiService.sendMessage(
+                            chatList.addAll(await ApiService.sendMessage(
                                 message: textEditingController.text,
-                                modelId: modelProvider.getCurrentModel);
+                                modelId: modelProvider.getCurrentModel)
+                            );
+                            setState(() {});
                           } catch (error) {
                             log("error $error");
                           } finally {
