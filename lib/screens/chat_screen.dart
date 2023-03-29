@@ -99,7 +99,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 print("error $error");
                               }
                             },
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.send,
                               color: Colors.white,
                             ))

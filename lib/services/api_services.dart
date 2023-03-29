@@ -17,7 +17,7 @@ class ApiService {
       Map jsonResponse = jsonDecode(response.body);
 
       if (jsonResponse['error'] != null) {
-        print("jsonResponse['error'] ${jsonResponse['error']["message"]}");
+        // print("jsonResponse['error'] ${jsonResponse['error']["message"]}");
         throw HttpException(jsonResponse['error']["message"]);
       }
       //print("jsonResponse $jsonResponse");
@@ -29,7 +29,7 @@ class ApiService {
       }
       return ModelsModel.modelsFromSnapshot(temp);
     } catch (error) {
-      print("error $error");
+      log("error $error");
       rethrow;
     }
   }
