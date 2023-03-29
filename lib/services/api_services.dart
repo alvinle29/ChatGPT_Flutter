@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import '../constants/api_constants.dart';
 
 class ApiService {
+
+  // get models
   static Future<List<ModelsModel>> getModels() async {
     try {
       var response = await http.get(
@@ -28,6 +30,39 @@ class ApiService {
         log("temp ${value["id"]}");
       }
       return ModelsModel.modelsFromSnapshot(temp);
+    } catch (error) {
+      log("error $error");
+      rethrow;
+    }
+  }
+
+  //send chats
+
+  static Future<void> sendMessage({required String message, required String modelId}) async {
+    try {
+      var response = await http.post(
+        Uri.parse("$BASE_URL/completions"),
+        headers: {'Authorization': 'Bearer $API_KEY',
+        'Content-Type': 'application/json'},
+        body: jsonEncode(
+          {
+            "model": modelId,
+            "prompt": message,
+            "max_tokens": 100,
+          },
+        )
+      );
+      Map jsonResponse = jsonDecode(response.body);
+
+      if (jsonResponse['error'] != null) {
+        // print("jsonResponse['error'] ${jsonResponse['error']["message"]}");
+        throw HttpException(jsonResponse['error']["message"]);
+      }
+      //print("jsonResponse $jsonResponse");
+
+      if (jsonResponse["choices"].length > 0) {
+        log("jsonResponse[choices]text ${jsonResponse["choices"][0]["text"]}");
+      }
     } catch (error) {
       log("error $error");
       rethrow;

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_gpt_application/constants/constants.dart';
 import 'package:chat_gpt_application/services/api_services.dart';
 import 'package:chat_gpt_application/services/assets_manager.dart';
@@ -6,6 +8,9 @@ import 'package:chat_gpt_application/widgets/chat_widget.dart';
 import 'package:chat_gpt_application/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/models_provider.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -33,6 +38,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final modelProvider = Provider.of<ModelsProvider>(context);
+
     return Scaffold(
         appBar: AppBar(
           elevation: 2,
@@ -94,9 +101,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         IconButton(
                             onPressed: () async {
                               try {
-                                await ApiService.getModels();
+                                await ApiService.sendMessage(
+                                    message: textEditingController.text,
+                                    modelId: modelProvider.getCurrentModel);
                               } catch (error) {
-                                print("error $error");
+                                log("error $error");
                               }
                             },
                             icon: const Icon(
