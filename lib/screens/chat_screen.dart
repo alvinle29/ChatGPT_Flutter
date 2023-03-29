@@ -20,7 +20,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  bool _isTyping = true;
+  bool _isTyping = false;
 
   late TextEditingController textEditingController;
 
@@ -60,65 +60,70 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
         body: SafeArea(
-          child: Column(
-            children: [
-              Flexible(
-                child: ListView.builder(
-                    itemCount: 6,
-                    itemBuilder: (context, index) {
-                      return ChatWidget(
-                        msg: chatMessages[index]["msg"].toString(),
-                        chatIndex: int.parse(
-                            chatMessages[index]["chatIndex"].toString()),
-                      );
-                    }),
-              ),
-              if (_isTyping) ...[
-                const SpinKitThreeBounce(
-                  color: Colors.white,
-                  size: 18,
-                ),
-                SizedBox(height: 15),
-                Material(
-                  color: cardColor,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                            child: TextField(
-                          style: const TextStyle(
-                            color: Colors.white,
-                          ),
-                          controller: textEditingController,
-                          onSubmitted: (value) {},
-                          decoration: const InputDecoration.collapsed(
-                              hintText: "How can I help you?",
-                              hintStyle: TextStyle(
-                                color: Colors.grey,
-                              )),
-                        )),
-                        IconButton(
-                            onPressed: () async {
-                              try {
-                                await ApiService.sendMessage(
-                                    message: textEditingController.text,
-                                    modelId: modelProvider.getCurrentModel);
-                              } catch (error) {
-                                log("error $error");
-                              }
-                            },
-                            icon: const Icon(
-                              Icons.send,
-                              color: Colors.white,
-                            ))
-                      ],
-                    ),
-                  ),
-                )
-              ]
+          child: Column(children: [
+            Flexible(
+              child: ListView.builder(
+                  itemCount: 6,
+                  itemBuilder: (context, index) {
+                    return ChatWidget(
+                      msg: chatMessages[index]["msg"].toString(),
+                      chatIndex: int.parse(
+                          chatMessages[index]["chatIndex"].toString()),
+                    );
+                  }),
+            ),
+            if (_isTyping) ...[
+              const SpinKitThreeBounce(
+                color: Colors.white,
+                size: 18,
+              )
             ],
-          ),
+            const SizedBox(height: 15),
+            Material(
+              color: cardColor,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: TextField(
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                      controller: textEditingController,
+                      onSubmitted: (value) {},
+                      decoration: const InputDecoration.collapsed(
+                          hintText: "How can I help you?",
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                          )),
+                    )),
+                    IconButton(
+                        onPressed: () async {
+                          try {
+                            setState(() {
+                              _isTyping = true;
+                            });
+                            await ApiService.sendMessage(
+                                message: textEditingController.text,
+                                modelId: modelProvider.getCurrentModel);
+                          } catch (error) {
+                            log("error $error");
+                          } finally {
+                            setState(() {
+                              _isTyping = false;
+                            });
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                        ))
+                  ],
+                ),
+              ),
+            )
+          ]),
         ));
   }
 }
