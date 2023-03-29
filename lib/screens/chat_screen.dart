@@ -23,18 +23,21 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isTyping = false;
 
   late TextEditingController textEditingController;
+  late FocusNode focusNode;
 
   List<ChatModel> chatList = [];
 
   @override
   void initState() {
     textEditingController = TextEditingController();
+    focusNode = FocusNode();
     super.initState();
   }
 
   @override
   void dispose() {
     textEditingController.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -92,7 +95,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         color: Colors.white,
                       ),
                       controller: textEditingController,
-                      onSubmitted: (value) {},
+                      focusNode: focusNode,
                       decoration: const InputDecoration.collapsed(
                           hintText: "How can I help you?",
                           hintStyle: TextStyle(
@@ -107,6 +110,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               chatList.add(ChatModel(
                                   msg: textEditingController.text,
                                   chatIndex: 0));
+                              focusNode.unfocus();
                             });
                             chatList.addAll(await ApiService.sendMessage(
                                 message: textEditingController.text,
